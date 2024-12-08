@@ -1,6 +1,40 @@
+using ET.Web.Data;
+using ET.Web.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Add service for the DbContext, using In-memory database for now
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseInMemoryDatabase("ETUnifiedDB");
+});
+
+// Add service for Identity, using our ApplicatioUser
+// model and our DbContext
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    // Set some loose-ish password policies for now
+    options.Password.RequiredLength = 8;
+    options.Password.RequireDigit = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Add authentication and authorization services
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+});
+builder.Services.AddAuthorization();
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -17,6 +51,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
