@@ -8,10 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// Add service for the DbContext, using In-memory database for now
+// Add service for the DbContext, using SQlit
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseInMemoryDatabase("ETUnifiedDB");
+    options.UseSqlite("DataSource=et.db");
 });
 
 // Add service for Identity, using our ApplicatioUser
