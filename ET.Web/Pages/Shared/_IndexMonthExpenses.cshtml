@@ -1,0 +1,103 @@
+@using ET.Web.Pages;
+@using ET.Web.Models;
+@model IndexModel
+
+<div class="text-center">
+    <h2>Monthly Expenses</h2>
+    <div>
+        <form method="post">
+            <select asp-for="CurrentMonth">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <select asp-for="CurrentYear">
+                using ET.Web.Models;
+                @{
+                    var thisyear = DateTime.Now.Year;
+                    for (var i = thisyear - 5; i <= thisyear; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                }
+            </select>
+            <button type="submit" asp-page-handler="MonthYear">Change</button>
+            <a href="/Index">Current Month</a>
+        </form>
+    </div>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                @* <th>Category</th> *@
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var expense in (Model.CurrentMonthExpenses ?? Enumerable.Empty<Expense>()))
+            {
+                <tr>
+                    <td>@expense.Date.ToLocalTime().ToShortDateString()</td>
+                    <td>@expense.Description</td>
+                    @* <td>@expense.Category</td> *@
+                    <td>@expense.Amount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h2>New Expense</h2>
+    <div>
+        <form id="addExpenseForm" method="post">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        @* <th>Category</th> *@
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input asp-for="NewExpenseItem.Date" type="date" id="dateInput" required>
+                        </td>
+                        <td>
+                            <input asp-for="NewExpenseItem.Description" type="text" id="descriptionInput"
+                                class="form-control" required>
+                        </td>
+                        @* <td>
+                            <select asp-for="NewExpenseItem.Category" id="categorySelect" class="form-control" required>
+                                <option value="Food">Food</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Housing">Housing</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Other">Other</option>
+                            </select>
+
+                        </td> *@
+                        <td>
+                            <input asp-for="NewExpenseItem.Amount" type="number" id="amountInput" required>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <input asp-for="CurrentMonth" type="hidden">
+            <input asp-for="CurrentYear" type="hidden">
+            <button type="submit" asp-page-handler="NewExpense" class="btn btn-primary">Add Expense</button>
+        </form>
+    </div>
+</div>
