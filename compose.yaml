@@ -3,11 +3,16 @@
 networks:
   etwebnet:
 
+volumes:
+  db-data:
+
 services:
   etweb:
     build:
       context: .
-      target: final
+      target: finalsqlite
+    volumes:
+      - db-data:/app/appdata
     networks:
       - etwebnet
     ports:
