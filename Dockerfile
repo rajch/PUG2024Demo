@@ -21,7 +21,18 @@ RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
 # If you need to enable globalization and time zones:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
+# Set up the Sqlite database in a subdirectory, with ownership set
+# to a non-privileged user.
+RUN <<EOSQLITE
+dotnet tool restore
+mkdir appdata/
+dotnet ef database update
+mkdir /app/appdata
+cp appdata/et.db /app/appdata/
+chown -R $APP_UID:$APP_UID /app/appdata
+EOSQLITE
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS finalsqlite
 WORKDIR /app
 
 # Copy everything needed to run the app from the "build" stage.
@@ -33,3 +44,7 @@ COPY --from=build /app .
 USER $APP_UID
 
 ENTRYPOINT ["dotnet", "ET.Web.dll"]
+
+# Advertise the mountpoint /app/appdata where the MySQL database
+# resides, so that a volume can be mounted there
+VOLUME ["/app/appdata"]

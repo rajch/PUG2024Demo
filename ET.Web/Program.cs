@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service for the DbContext, using SQlit
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlite("DataSource=et.db");
+    options.UseSqlite("DataSource=appdata/et.db");
 });
 
 // Add service for Identity, using our ApplicatioUser
@@ -50,6 +50,29 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
+// Test for invalid configuration
+using (var scope = app.Services.CreateAsyncScope())
+{
+    ApplicationDbContext? db = scope.ServiceProvider.GetService<ApplicationDbContext>();
+    ILogger logger = app.Logger;
+    if (db == null)
+    {
+        logger.Log(LogLevel.Critical, "Could not connect to database service.");
+        return 1;
+    }
+
+    try
+    {
+        var checkUsers = await db.Users.Where(u => 1 == 2).ToListAsync();
+        var checkExpenses = await db.Expenses.Where(e => 1 == 2).ToListAsync();
+    }
+    catch
+    {
+        logger.Log(LogLevel.Critical, "Database structure not valid.");
+        return 1;
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -75,3 +98,4 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
+return 0;
