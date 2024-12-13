@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: et-web
+  labels:
+    component: et-web
+    part-of: expensetracker
+spec:
+  type: NodePort
+  selector:
+    component: et-web
+    part-of: expensetracker
+    layer: frontend
+  ports:
+    - name: et-web
+      port: 8080
+      nodePort: 31000

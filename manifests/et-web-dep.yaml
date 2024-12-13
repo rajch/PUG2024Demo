@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: et-web-dep
+  labels:
+    component: et-web
+    part-of: expensetracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: et-web
+      part-of: expensetracker
+      layer: frontend
+  template:
+    metadata:
+      labels:
+        component: et-web
+        part-of: expensetracker
+        layer: frontend
+    spec:
+      containers:
+        - name: et-web
+          image: rajchaudhuri/et-web:postgres
+          resources:
+            requests:
+              memory: 0.5Gi
+            limits:
+              memory: 2Gi

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: et-db-dep
+  labels:
+    component: et-db
+    part-of: expensetracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: et-db
+      part-of: expensetracker
+      layer: backend
+  template:
+    metadata:
+      labels:
+        component: et-db
+        part-of: expensetracker
+        layer: backend
+    spec:
+      volumes:
+        - name: et-web-data
+          persistentVolumeClaim:
+            claimName: et-web-pvc
+      containers:
+        - name: et-web
+          image: postgres:alpine
+          volumeMounts:
+            - name: et-web-data
+              mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_DB
+              value: ExpenseTrackerDB
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: something

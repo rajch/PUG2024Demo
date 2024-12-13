@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    component: et-db
+    part-of: expensetracker
+spec:
+  type: ClusterIP
+  selector:
+    component: et-db
+    part-of: expensetracker
+    layer: backend
+  ports:
+    - name: postgresql
+      port: 5432

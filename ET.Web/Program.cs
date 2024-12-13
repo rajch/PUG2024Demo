@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service for the DbContext, using In-memory database for now
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseInMemoryDatabase("ETUnifiedDB");
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PGDBConnection"));
 });
 
 // Add service for Identity, using our ApplicatioUser
@@ -50,6 +50,33 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
+// Test for invalid configuration
+using (var scope = app.Services.CreateAsyncScope())
+{
+    ApplicationDbContext? db = scope.ServiceProvider.GetService<ApplicationDbContext>();
+    ILogger logger = app.Logger;
+    if (db == null)
+    {
+        logger.Log(LogLevel.Critical, "Could not connect to database service.");
+        return 1;
+    }
+
+    try
+    {
+        // Try to perform migration at start
+        db.Database.Migrate();
+
+        // Check for presence of required tables
+        var checkUsers = await db.Users.Where(u => 1 == 2).ToListAsync();
+        var checkExpenses = await db.Expenses.Where(e => 1 == 2).ToListAsync();
+    }
+    catch(Exception ex)
+    {
+        logger.Log(LogLevel.Critical, "Database structure not valid: {error}", ex.ToString());
+        return 1;
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -75,3 +102,5 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
+
+return 0;
