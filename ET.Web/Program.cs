@@ -2,6 +2,7 @@ using ET.Web.Data;
 using ET.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,16 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 
+// Add health checks
+builder.Services.AddHealthChecks()
+                .AddDbContextCheck<ApplicationDbContext>(
+                    name:"connectioncheck",
+                    tags: ["ready"]
+                )
+;
+
+// Add Razor Pages
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -53,6 +64,11 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHealthChecks("/healthz", new HealthCheckOptions
+{
+    Predicate = healthCheck => healthCheck.Tags.Contains("ready")
+});
 
 app.MapStaticAssets();
 app.MapRazorPages()
