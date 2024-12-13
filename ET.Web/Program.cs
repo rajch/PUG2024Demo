@@ -63,12 +63,16 @@ using (var scope = app.Services.CreateAsyncScope())
 
     try
     {
+        // Try to perform migration at start
+        db.Database.Migrate();
+
+        // Check for presence of required tables
         var checkUsers = await db.Users.Where(u => 1 == 2).ToListAsync();
         var checkExpenses = await db.Expenses.Where(e => 1 == 2).ToListAsync();
     }
-    catch
+    catch(Exception ex)
     {
-        logger.Log(LogLevel.Critical, "Database structure not valid.");
+        logger.Log(LogLevel.Critical, "Database structure not valid: {error}", ex.ToString());
         return 1;
     }
 }
