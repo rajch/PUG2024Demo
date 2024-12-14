@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: et-adminer
+  labels:
+    component: et-db
+    part-of: expensetracker
+spec:
+  type: NodePort
+  selector:
+    component: et-db
+    part-of: expensetracker
+    layer: monitor
+  ports:
+    - name: adminer
+      port: 8080
+      nodePort: 31001
+

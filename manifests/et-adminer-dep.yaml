@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: et-adminer-dep
+  labels:
+    component: et-db
+    part-of: expensetracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: et-db
+      part-of: expensetracker
+      layer: monitor
+  template:
+    metadata:
+      labels:
+        component: et-db
+        part-of: expensetracker
+        layer: monitor
+    spec:
+      containers:
+        - name: et-adminer
+          image: adminer:4.8.1-standalone
+          env:
+            - name: ADMINER_DEFAULT_SERVER
+              value: db
