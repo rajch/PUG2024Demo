@@ -6,7 +6,7 @@ metadata:
     component: et-web
     part-of: expensetracker
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       component: et-web
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: et-web
-          image: rajchaudhuri/et-web:postgres
+          image: rajchaudhuri/et-web:postgres-2
           resources:
             requests:
               memory: 0.5Gi
